@@ -3,25 +3,39 @@ import { ReactComponent as CorrectIcon } from '../svg/correct.svg';
 import { ReactComponent as IncorrectIcon } from '../svg/incorrect.svg';
 import { ReactComponent as FinalIcon } from '../svg/final.svg';
 import { ReactComponent as Loading } from '../svg/loading.svg';
-import { useQuestions } from './hook';
+import { useQuestions, useAnswer } from './hook';
 
 function Questions() {
   const [questID, setQuestID] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState();
   const [correctAnswer, setCorrectAnswer] = useState();
   const [countCorrect, setCountCorrect] = useState(0);
+  const [listSelecteds, setListSelecteds] = useState([]);
   const isCorrect = correctAnswer === selectedAnswer;
-  const { getQuestions, questions, status } = useQuestions();
+  const { getQuestions, questions, status: questionStatus } = useQuestions();
+  const { getQuestionsResult, status, answer } = useAnswer();
 
   useEffect(() => {
     getQuestions();
   }, [getQuestions]);
 
-  const nextQuestion = () => {
+  const nextQuestion = (question) => {
     const nextID = questID + 1;
+    const list = [
+      ...listSelecteds,
+      {
+        questionId: question.id,
+        answerId: selectedAnswer
+      }
+    ];
     setQuestID(nextID);
     setCorrectAnswer();
+    setListSelecteds(list);
     setSelectedAnswer();
+
+    if (questions[nextID] === undefined) {
+      getQuestionsResult(list);
+    }
   }
 
   const onRestart = () => window.location.href = '/quiz-app';
@@ -84,7 +98,7 @@ function Questions() {
             )}
           </ul>
           {renderIcon()}
-          <button onClick={nextQuestion}>Next</button>
+          <button onClick={() => nextQuestion(question)} disabled={!selectedAnswer}>Next</button>
         </>
       )
     }

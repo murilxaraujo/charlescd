@@ -23,3 +23,32 @@ export const useQuestions = () => {
     getQuestions
   }
 }
+
+export const useAnswer = () => {
+  const [answer, setAnswer] = useState({});
+  const [status, setStatus] = useState('idle');
+
+  const getQuestionsResult = useCallback(async (payload) => {
+    try {
+      setStatus('pending');
+      const { data } = await request(
+        '/quiz-app-api/v1/answers',
+        { method: 'POST', data: payload }
+      );
+      setStatus('resolved');
+      setAnswer({
+        ...data,
+        percentageScore: data.percentageScore * 100
+      });
+    } catch (e) {
+      setStatus('rejected');
+      console.error(e);
+    }
+  }, [])
+
+  return {
+    answer,
+    status,
+    getQuestionsResult
+  }
+}
