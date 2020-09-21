@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getCircleId } from "../utils/cookie";
+import { getCircleId } from '../utils/cookie';
 
 const instance = axios.create({
   headers: {
