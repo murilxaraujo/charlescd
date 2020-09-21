@@ -29,7 +29,6 @@ function Questions() {
       }
     ];
     setQuestID(nextID);
-    setCorrectAnswer();
     setListSelecteds(list);
     setSelectedAnswer();
 
@@ -73,9 +72,15 @@ function Questions() {
 
   const renderFinish = () => (
     <>
-      <FinalIcon className="final" />
-      <span className="result">You got {countCorrect} out of {questions.length}.</span>
-      <button onClick={onRestart}>Restart</button>
+      { status === 'pending' && <Loading /> }
+      { status === 'resolved' && (
+        <>
+          <FinalIcon className="final" />
+          <span className="result">You got {answer.percentageScore}% out of the questions right.</span>
+          <button onClick={onRestart}>Restart</button>
+        </>
+      )}
+      { status === 'rejected' && <button onClick={onRestart}>Restart</button>}
     </>
   )
 
@@ -110,9 +115,9 @@ function Questions() {
     <>
       <section className="question">
         <h4 className="practice-text">Practice Quiz for Darwin and Natural Selection</h4>
-        {status === 'pending' && <Loading />}
-        {status === 'resolved' && renderQuestion()}
-        {status === 'rejected' && renderFinish()}
+        {questionStatus === 'pending' && <Loading />}
+        {questionStatus === 'resolved' && renderQuestion()}
+        {questionStatus === 'rejected' && renderFinish()}
       </section>
     </>
   );
