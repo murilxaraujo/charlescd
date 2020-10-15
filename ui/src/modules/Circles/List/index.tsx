@@ -103,8 +103,7 @@ const CirclesList = () => {
     >
       <Text.h1 color="dark" align="center" weight="bold">
         You need{' '}
-        <Styled.Link href={routes.credentials}>to add your</Styled.Link> metrics
-        provider configuration to get health from your circles.
+        <Styled.Link href={routes.credentials}>to add your</Styled.Link> datasource health configuration to get health from your circles.
       </Text.h1>
     </Styled.PagePlaceholder>
   );
