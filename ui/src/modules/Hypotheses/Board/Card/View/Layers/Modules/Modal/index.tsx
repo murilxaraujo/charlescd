@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, { Fragment, useState, useEffect } from 'react';
+import React, { Fragment, useState, useEffect, useCallback } from 'react';
 import map from 'lodash/map';
 import filter from 'lodash/filter';
 import xor from 'lodash/xor';
@@ -46,23 +46,30 @@ interface Props {
 
 const Modal = ({ card, modules, allModules, onClose }: Props) => {
   const MAX_LENGTH_BRANCH_NAME = 40;
-  const { persistModules, loading } = useModules();
+  const { persistModules, status } = useModules();
   const [modulesFiltered, filterModules] = useState<ModuleProps[]>(allModules);
   const [moduleIds, setModuleIds] = useState<string[]>();
   const { register, errors, handleSubmit, setValue, watch } = useForm({
     mode: 'onBlur'
   });
+  const isLoading = status === 'pending';
 
   const branchName =
     card.feature?.branchName || (watch('branchName') as string);
 
-  const handleClose = () => onClose();
+  const handleClose = useCallback(() => onClose(), [onClose]);
 
   useEffect(() => {
     if (modules) {
       setModuleIds(map(modules, 'id'));
     }
   }, [modules]);
+
+  useEffect(() => {
+    if (status === 'rejected') {
+      handleClose();
+    }
+  }, [handleClose, status]);
 
   const onChangeFilter = (value: string) => {
     filterModules(
@@ -95,7 +102,7 @@ const Modal = ({ card, modules, allModules, onClose }: Props) => {
       <Checked
         checked={includes(moduleIds, id)}
         id={id}
-        isLoading={loading}
+        isLoading={isLoading}
         onChange={(id: string) => toggleModule(id)}
       />
     </Styled.Module>
@@ -146,7 +153,7 @@ const Modal = ({ card, modules, allModules, onClose }: Props) => {
       <Styled.Bottom onSubmit={handleSubmit(onSubmit)}>
         {!isEmpty(moduleIds) && renderBranchField()}
         <Button.Default
-          isLoading={loading}
+          isLoading={isLoading}
           isDisabled={!isEmpty(moduleIds) && isEmpty(branchName)}
           type="submit"
           size="EXTRA_SMALL"
